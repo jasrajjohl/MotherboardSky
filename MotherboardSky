@@ -1,0 +1,347 @@
+# Creating Dungeon Crawler Python Test Game
+
+# Imports
+import numpy as np
+
+# TODO Add Static Variables Here
+
+# Organisms
+
+class Character:
+  def __init__(self, name, hp): # TODO Need to add lvl and kill count to assist in all enemy and weapon generation
+    # TODO Add MP
+    self.name = name
+    self.hp = hp
+
+# Heroes
+
+class Hero(Character):
+  def __init__(self, name, hp, kill_count, left_hand, right_hand, gold):
+    super().__init__(name)
+    super().__init__(hp)
+    self.kill_count = 0 # Number of enemies killed to scale enemy difficulty with player progression
+    self.left_hand = left_hand
+    self.right_hand = right_hand
+    self.gold = 0
+
+    # TODO Special Moves Functions
+
+class Corporate(Hero):
+  def __init__(self, name, hp, left_hand, right_hand, gold):
+    self.name = 'Corporate'
+    self.hp = 15
+    self.left_hand = None
+    self.right_hand = NanoSword()
+    self.gold = 2
+
+class Punk(Hero):
+  def __init__(self, name, hp, left_hand, right_hand, gold):
+    self.name = 'Punk'
+    self.hp = 12
+    self.left_hand = None
+    self.right_hand = Hammer()
+    self.gold = 1
+
+class Detective(Hero):
+  def __init__(self, name, hp, left_hand, right_hand, gold):
+    self.name = 'Detective'
+    self.hp = 17
+    self.left_hand = None
+    self.right_hand = LaserGun()
+    self.gold = 0
+
+
+# Enemies
+
+class Enemy(Character):
+  def __init__(self, name, hp, move_a, move_b):
+    super().__init__(name)
+    super().__init__(hp)
+    self.move_a = move_a
+    self.move_b = move_b
+
+class Agent(Enemy):
+  def __init__(self, name, hp, move_a, move_b):
+    self.name = 'Agent'
+    self.hp = 10
+    
+    def gunshot(self, floor): # TODO Edit Move
+      name = 'Gunshot'
+      damage = 3
+      crit_chance = .1
+    
+    def karate(self, floor): # TODO Edit Move
+      name = 'Karate'
+      damage = 3
+      crit_chance = .1
+
+class LabBeast(Enemy):
+  def __init__(self, name, hp, move_a, move_b):
+    self.name = 'Lab Beast'
+    super().__init__(hp)
+    self.move_a = move_a
+    self.move_b = move_b
+
+  def claw_strike(self, floor): # TODO Edit Move
+    name = 'Claw Strike'
+    damage = 3
+    crit_chance = .1
+  
+  def tail_whip(self, floor): # TODO Edit Move
+    name = 'Tail Whip'
+    damage = 3
+    crit_chance = .1
+
+class Mutant(Enemy):
+  def __init__(self, name, hp, move_a, move_b):
+    self.name = 'Mutant'
+    super().__init__(hp)
+    self.move_a = move_a
+    self.move_b = move_b
+
+  def ooze(self, floor): # TODO Edit Move
+    name = 'Ooze'
+    damage = 3
+    crit_chance = .1
+    
+  def body_crash(self, floor): # TODO Edit Move
+    name = 'Body Crash'
+    damage = 3
+    crit_chance = .1
+
+  # TODO Suffocate insta-kill move
+
+
+class Android(Enemy):
+  def __init__(self, name, hp, move_a, move_b):
+    self.name = 'Android'
+    super().__init__(hp)
+    self.move_a = move_a
+    self.move_b = move_b
+
+  # TODO Create Moves
+
+class Machine(Enemy):
+  def __init__(self, name, hp, move_a, move_b):
+    self.name = 'Machine'
+    super().__init__(hp)
+    self.move_a = move_a
+    self.move_b = move_b
+
+  # TODO Create Moves
+
+# Bosses
+
+class Boss(Enemy):
+  def __init__(self, name, hp, move_a, move_b, move_c):
+    super().__init__(name)
+    super().__init__(hp)
+    self.move_a = move_a
+    self.move_b = move_b
+    self.move_c = move_c
+
+class EvilScientist(Boss):
+  def __init__(self, name, hp, move_a, move_b, move_c):
+    self.name = 'Evil Scientist'
+    super().__init__(hp)
+    super().__init__(move_a)
+    super().__init__(move_b)
+    super().__init__(move_c)
+
+  def chemical_flask(self, floor): # TODO Edit Move
+    name = 'Chemical Flask'
+    damage = 3
+    crit_chance = .1
+    
+  def tesla_coil(self, floor): # TODO Edit Move
+    name = 'Tesla Coil'
+    damage = 3
+    crit_chance = .1
+
+  def nano_bots(self, floor): # TODO Edit Move
+    name = 'Nano Bots'
+    damage = 3
+    crit_chance = .1
+
+
+# Weapons
+
+class Weapon:
+  def __init__(self, name, move_a, move_b, crit_chance, cost):
+    self.name = name
+    self.move_a = move_a
+    self.move_b = move_b
+    self.crit_chance = crit_chance
+    self.cost = cost
+
+class NanoSword(Weapon):
+  def __init__(self, name, move_a, move_b, crit_chance, cost):
+    self.name = 'Nano Sword'
+    super().__init__(move_a)
+    super().__init__(move_b)
+    super().__init__(crit_chance)
+    super().__init__(cost)
+    
+  def fire_slash(self, floor): # TODO Edit Move
+    name = 'Fire Slash'
+    damage = 3
+    crit_chance = .1
+
+  def needle_strike(self, floor): # TODO Edit Move
+    name = 'Needle Strike'
+    damage = 3
+    crit_chance = .1
+
+class LaserGun(Weapon):
+  def __init__(self, name, move_a, move_b, crit_chance, cost):
+    self.name = 'Laser Gun'
+    super().__init__(move_a)
+    super().__init__(move_b)
+    super().__init__(crit_chance)
+    super().__init__(cost)
+
+  def gunshot(self, floor): # TODO Edit Move
+    name = 'Gunshot'
+    damage = 3
+    crit_chance = .1
+
+  def laser_beam(self, floor): # TODO Edit Move
+    name = 'Laser Beam'
+    damage = 3
+    crit_chance = .1
+
+class Hammer(Weapon):
+  def __init__(self, name, move_a, move_b, crit_chance, cost):
+    self.name = 'Hammer'
+    super().__init__(move_a)
+    super().__init__(move_b)
+    super().__init__(crit_chance)
+    super().__init__(cost)
+
+  def hammer_rush(self, floor): # TODO Edit Move
+    name = 'Hammer Rush'
+    damage = 3
+    crit_chance = .1
+
+  def nail_strike(self, floor): # TODO Edit Move
+    name = 'Laser Beam'
+    damage = 3
+    crit_chance = .1
+
+class BioGun(Weapon):
+  def __init__(self, name, move_a, move_b, crit_chance, cost):
+    self.name = 'Bio-Gun'
+    super().__init__(move_a)
+    super().__init__(move_b)
+    super().__init__(crit_chance)
+    super().__init__(cost)
+
+  # Create Move
+
+# Rooms()
+
+class Room:
+  def __init__(self, north, east, south, west, cleared, enemy, item, gold):
+    self.north = None
+    self.east = None
+    self.south = None
+    self.west = None
+    self.cleared = False
+    self.enemy = None
+    self.item = None
+    self.gold = None
+
+    def connect(self, north, east, south, west):
+      self.north = north
+      self.east = east
+      self.south = south
+      self.west = west
+
+    def furnish(self, lvl, kill_count): # Do Room Generation Function
+      self.enemy = np.random(Mutant(lvl, kill_count))
+      self.item = np.random(LaserGun(lvl, kill_count)) 
+      self.gold = gold_calc(lvl, kill_count)
+
+    def gold_calc(lvl, kill_count):
+      return np.random[range(1* lvl, 3*lvl)] + (np.random(range(kill_count // 4)))
+      # Max luck: 3 * lvl + kill_count // 4
+      # Min luck: 1 * lvl + 0
+
+class Battle(Room):
+  def __init__(self, north, east, south, west, enemy):
+    super().__init__(north)
+    super().__init__(east)
+    super().__init__(south)
+    super().__init__(west)
+    super().__init__(enemy)
+    def battle()
+
+class Treasure(Room):
+  def __init__(self, north, east, south, west, enemy, item):
+    super().__init__(north)
+    super().__init__(east)
+    super().__init__(south)
+    super().__init__(west)
+    super().__init__(enemy)
+
+class Shop(Room):
+  def __init__(self, north, east, south, west, enemy, item_a, item_b, item_c):
+    super().__init__(north)
+    super().__init__(east)
+    super().__init__(south)
+    super().__init__(west)
+    super().__init__(enemy)
+    self.item_a = item_a
+    self.item_b = item_b
+    self.item_c = item_c
+
+# Moves
+
+# Guess a number to dinish Boss Super attack move?
+
+
+
+def main():
+  return 
+
+def generate_level_one():
+  r_1_1 = Battle()
+  r_1_2 = Battle()
+  r_1_3 = Treasure()
+  r_1_4 = Battle()
+  r_1_5 = Battle()
+  r_1_6 = Battle()
+  r_1_7 = Treasure()
+  r_1_8 = Battle()
+  r_1_9 = Treasure()
+  r_1_10 = Battle()
+  r_1_11 = Battle()
+  r_1_12 = Battle()
+  r_1_13 = Battle()
+  r_1_14 = Battle() # Boss Room
+  r_1_15 = Shop()
+  r_1_16 = Treasure()
+  r_1_17 = Battle()
+
+              # north, east, south, west
+  r_1_1.connect(r_1_2, r_1_10, None, None)
+  r_1_2.connect(None, None, r_1_1, r_1_3)
+  r_1_3.connect(None, r_1_2, r_1_4, None)
+  r_1_4.connect(r_1_3, None, None, r_1_5)
+  r_1_5.connect(r_1_6, r_1_4, None, None)
+  r_1_6.connect(r_1_8, r_1_9, r_1_5, r_1_7)
+  r_1_7.connect(None, r_1_6, None, None)
+  r_1_8.connect(None, None, r_1_6, None)
+  r_1_9.connect(None, None, None, r_1_6)
+  r_1_10.connect(r_1_11, r_1_17, None, r_1_1)
+  r_1_11.connect(r_1_12, r_1_16, r_1_10, None)
+  r_1_12.connect(r_1_15, None, r_1_11, r_1_13)
+  r_1_13.connect(r_1_14, r_1_12, None, None)
+  r_1_14.connect(None, None, None, None) # Boss Room
+  r_1_15.connect(None, None, r_1_12, None)
+  r_1_16.connect(None, None, None, r_1_11)
+  r_1_17.connect(None, None, None, r_1_10)
+
+
+
+  return
