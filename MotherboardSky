@@ -1,51 +1,88 @@
+Second Version
+
 # Creating Dungeon Crawler Python Test Game
 
 # Imports
 import numpy as np
+import math
+import pyinputplus as pyip
 
 # TODO Add Static Variables Here
 
 # Organisms
 
 class Character:
-  def __init__(self, name, hp): # TODO Need to add lvl and kill count to assist in all enemy and weapon generation
-    # TODO Add MP
+  def __init__(self, name, max_hp, hp): # TODO Need to add floor and kill count to assist in all enemy and weapon generation
+    # TODO Add MP/Max MP
     self.name = name
+    self.max_hp = max_hp
     self.hp = hp
+
+  # TODO Description
+  def restore_health(self, restore_val):
+    self.hp = min(self.hp+restore_val, self.max_hp)
 
 # Heroes
 
 class Hero(Character):
-  def __init__(self, name, hp, kill_count, left_hand, right_hand, gold):
+  def __init__(self, player_name, name, max_hp, hp, left_hand, right_hand, gold):
+    self.player_name = player_name
     super().__init__(name)
+    super().__init__(max_hp)
     super().__init__(hp)
     self.kill_count = 0 # Number of enemies killed to scale enemy difficulty with player progression
     self.left_hand = left_hand
     self.right_hand = right_hand
     self.gold = 0
 
-    # TODO Special Moves Functions
+  def increase_health(self, increase_val):
+    self.max_hp += increase_val
+    self.hp += increase_val
+    # TODO Add dialogue
+
+  def increase_gold(self, increase_val):
+    self.gold += increase_val
+    # TODO Add dialogue
+
+  def add_item(self, item):
+    if item.__mro__ is Weapon:
+      if not self.left_hand:
+        hand = 'left'
+        self.left_hand = item
+      else:
+        # TODO Add dialogue and stats for both weapons
+        hand = pyip.inputMenu(['Left', 'Right'], '')
+        if hand == 'left':
+          self.left_hand = item
+        else:
+          self.right_hand = item
+
+      # TODO Add dialogue using hand designation
+
+
+
+  # TODO Special Moves Functions
 
 class Corporate(Hero):
   def __init__(self, name, hp, left_hand, right_hand, gold):
     self.name = 'Corporate'
-    self.hp = 15
+    self.max_hp = self.hp = 15
     self.left_hand = None
     self.right_hand = NanoSword()
-    self.gold = 2
+    self.gold = 4
 
 class Punk(Hero):
   def __init__(self, name, hp, left_hand, right_hand, gold):
     self.name = 'Punk'
-    self.hp = 12
+    self.max_hp = self.hp = 12
     self.left_hand = None
     self.right_hand = Hammer()
-    self.gold = 1
+    self.gold = 2
 
 class Detective(Hero):
   def __init__(self, name, hp, left_hand, right_hand, gold):
     self.name = 'Detective'
-    self.hp = 17
+    self.max_hp = self.hp = 17
     self.left_hand = None
     self.right_hand = LaserGun()
     self.gold = 0
@@ -54,33 +91,39 @@ class Detective(Hero):
 # Enemies
 
 class Enemy(Character):
-  def __init__(self, name, hp, move_a, move_b):
+  def __init__(self, name, max_hp, hp, floor, kill_count, move_a, move_b):
     super().__init__(name)
+    super().__init__(max_hp)
     super().__init__(hp)
-    self.move_a = move_a
-    self.move_b = move_b
+    self.moves = {}
+    self.floor = floor
+    self.kill_count = kill_count
 
 class Agent(Enemy):
-  def __init__(self, name, hp, move_a, move_b):
+  def __init__(self, floor, kill_count, move_a, move_b):
     self.name = 'Agent'
-    self.hp = 10
+    self.max_hp = self.hp = 10
+    super().__init__(floor)
+    super().__init__(kill_count)
     
-    def gunshot(self, floor): # TODO Edit Move
-      name = 'Gunshot'
-      damage = 3
-      crit_chance = .1
-    
-    def karate(self, floor): # TODO Edit Move
-      name = 'Karate'
-      damage = 3
-      crit_chance = .1
+  def gunshot(self, floor): # TODO Edit Move
+    name = 'Gunshot'
+    damage = 3
+    crit_chance = .1
+  
+  def karate(self, floor): # TODO Edit Move
+    name = 'Karate'
+    damage = 3
+    crit_chance = .1
 
 class LabBeast(Enemy):
-  def __init__(self, name, hp, move_a, move_b):
+  def __init__(self, floor, kill_count, move_a, move_b):
     self.name = 'Lab Beast'
-    super().__init__(hp)
+    self.max_hp = self.hp = 8
     self.move_a = move_a
     self.move_b = move_b
+    super().__init__(floor)
+    super().__init__(kill_count)
 
   def claw_strike(self, floor): # TODO Edit Move
     name = 'Claw Strike'
@@ -93,11 +136,13 @@ class LabBeast(Enemy):
     crit_chance = .1
 
 class Mutant(Enemy):
-  def __init__(self, name, hp, move_a, move_b):
+  def __init__(self, floor, kill_count, move_a, move_b):
     self.name = 'Mutant'
-    super().__init__(hp)
+    self.max_hp = self.hp = 12
     self.move_a = move_a
     self.move_b = move_b
+    super().__init__(floor)
+    super().__init__(kill_count)
 
   def ooze(self, floor): # TODO Edit Move
     name = 'Ooze'
@@ -143,7 +188,7 @@ class Boss(Enemy):
 class EvilScientist(Boss):
   def __init__(self, name, hp, move_a, move_b, move_c):
     self.name = 'Evil Scientist'
-    super().__init__(hp)
+    self.hp = 20
     super().__init__(move_a)
     super().__init__(move_b)
     super().__init__(move_c)
@@ -167,20 +212,25 @@ class EvilScientist(Boss):
 # Weapons
 
 class Weapon:
-  def __init__(self, name, move_a, move_b, crit_chance, cost):
+  def __init__(self, name, floor, kill_count, move_a, move_b, crit_chance, cost):
     self.name = name
     self.move_a = move_a
     self.move_b = move_b
     self.crit_chance = crit_chance
     self.cost = cost
+    self.floor = floor
+    self.kill_count = kill_count
+
 
 class NanoSword(Weapon):
-  def __init__(self, name, move_a, move_b, crit_chance, cost):
+  def __init__(self, floor, kill_count, move_a, move_b, crit_chance, cost):
     self.name = 'Nano Sword'
     super().__init__(move_a)
     super().__init__(move_b)
     super().__init__(crit_chance)
     super().__init__(cost)
+    super().__init__(floor)
+    super().__init__(kill_count)
     
   def fire_slash(self, floor): # TODO Edit Move
     name = 'Fire Slash'
@@ -193,12 +243,14 @@ class NanoSword(Weapon):
     crit_chance = .1
 
 class LaserGun(Weapon):
-  def __init__(self, name, move_a, move_b, crit_chance, cost):
+  def __init__(self, floor, kill_count, move_a, move_b, crit_chance, cost):
     self.name = 'Laser Gun'
     super().__init__(move_a)
     super().__init__(move_b)
     super().__init__(crit_chance)
     super().__init__(cost)
+    super().__init__(floor)
+    super().__init__(kill_count)
 
   def gunshot(self, floor): # TODO Edit Move
     name = 'Gunshot'
@@ -211,61 +263,67 @@ class LaserGun(Weapon):
     crit_chance = .1
 
 class Hammer(Weapon):
-  def __init__(self, name, move_a, move_b, crit_chance, cost):
+  def __init__(self, floor, kill_count, move_a, move_b, crit_chance, cost):
     self.name = 'Hammer'
     super().__init__(move_a)
     super().__init__(move_b)
     super().__init__(crit_chance)
     super().__init__(cost)
+    super().__init__(floor)
+    super().__init__(kill_count)
 
-  def hammer_rush(self, floor): # TODO Edit Move
+  def hammer_rush(self, floor, kill_count): # TODO Edit Move
     name = 'Hammer Rush'
     damage = 3
     crit_chance = .1
 
-  def nail_strike(self, floor): # TODO Edit Move
+  def nail_strike(self, floor, kill_count): # TODO Edit Move
     name = 'Laser Beam'
     damage = 3
     crit_chance = .1
 
 class BioGun(Weapon):
-  def __init__(self, name, move_a, move_b, crit_chance, cost):
+  def __init__(self, floor, kill_count, move_a, move_b, crit_chance, cost):
     self.name = 'Bio-Gun'
     super().__init__(move_a)
     super().__init__(move_b)
     super().__init__(crit_chance)
     super().__init__(cost)
+    super().__init__(floor)
+    super().__init__(kill_count)
 
   # Create Move
 
 # Rooms()
 
 class Room:
-  def __init__(self, north, east, south, west, cleared, enemy, item, gold):
+  def __init__(self, floor):
+    self.connections = {}
     self.north = None
     self.east = None
     self.south = None
     self.west = None
+    self.floor = floor
+    self.hero = None
     self.cleared = False
     self.enemy = None
     self.item = None
     self.gold = None
+    self.organ = None
 
-    def connect(self, north, east, south, west):
-      self.north = north
-      self.east = east
-      self.south = south
-      self.west = west
+  def connect(self, north, east, south, west):
+    self.connections['north'] = north
+    self.connections['neast'] = east
+    self.connections['south'] = south
+    self.connections['west'] = west
 
-    def furnish(self, lvl, kill_count): # Do Room Generation Function
-      self.enemy = np.random(Mutant(lvl, kill_count))
-      self.item = np.random(LaserGun(lvl, kill_count)) 
-      self.gold = gold_calc(lvl, kill_count)
+  def enter(self, hero):
+    self.hero = hero
+    self.furnish(self.floor, hero.kill_count)
 
-    def gold_calc(lvl, kill_count):
-      return np.random[range(1* lvl, 3*lvl)] + (np.random(range(kill_count // 4)))
-      # Max luck: 3 * lvl + kill_count // 4
-      # Min luck: 1 * lvl + 0
+  def exit(self, direction): 
+    self.connections[direction].enter(self.hero)
+
 
 class Battle(Room):
   def __init__(self, north, east, south, west, enemy):
@@ -274,7 +332,62 @@ class Battle(Room):
     super().__init__(south)
     super().__init__(west)
     super().__init__(enemy)
-    def battle()
+
+  def gold_calc(floor, kill_count):
+    return np.random[range(1* floor, 3*floor)] + (np.random(range(kill_count // 4)))
+    # Max luck: 3 * floor + kill_count // 4
+    # Min luck: 1 * floor + 0
+  
+  def organ_calc(floor, kill_count):
+    return  np.random[range(math.ceil(1.5*floor), math.ceil(2.75*floor))]
+    # Max luck: math.ceil(2.75 * floor)
+    # Min luck: math.ceil(1.5*floor)
+      
+  def enter(self):
+    if not self.cleared:
+      super().enter()
+      self.battle(self.hero, self.enemy)
+      self.upgrade()
+      self.cleared = True
+    else:
+      # TODO Dialogue stating you have been here already
+      pass # TODO Delete
+    self.exit(pyip.inputMenu(['north', 'east', 'south', 'west'], '')) # TODO Add Dialogue for exiting
+
+  def furnish(self, floor, kill_count): # Do Room Generation Function
+    self.enemy = np.random(Agent, LabBeast, Mutant)(floor, kill_count)
+    self.item = np.random(NanoSword, LaserGun, Hammer)(floor, kill_count)
+    self.gold = self.gold_calc(floor, kill_count)
+    self.organ = self.organ_calc(floor, kill_count)
+
+  def upgrade(self):
+    # TODO Dialogue telling gold amount and item's stats
+    upgrade_path = pyip.inputMenu(['Organ', 'Gold', 'Weapon'], '')    
+  
+    if upgrade_path == 'Organ':
+      self.hero.restore_health(self.organ)
+    elif upgrade_path == 'Gold':
+      self.hero.increase_gold(self.gold)
+    elif upgrade_path == 'Weapon':
+      self.hero.add_item(self.item)
+
+  # TODO Add Battle Loop
+  def battle(self, hero, enemy):
+    # TODO Add Dialogue
+    while hero.hp > 0:
+      pyip.inputMenu(['Check Attacks', hero.left_hand.move_a.__name_, hero.left_hand.move_b.__name_, hero.right_hand.move_a.__name_, hero.right_hand.move_a.__name_,])
+      
+      # TODO Hero Move
+      if enemy.hp > 0:
+        # TODO Enemy Move
+        print()
+      else:
+        # TODO Win Dialogue
+        print()
+
+    
+    # TODO Game Over Dialogue
+    # TODO Ask to Try Again, If Yes Clear and Run main() again
 
 class Treasure(Room):
   def __init__(self, north, east, south, west, enemy, item):
@@ -283,6 +396,17 @@ class Treasure(Room):
     super().__init__(south)
     super().__init__(west)
     super().__init__(enemy)
+
+  # TODO Add Upgrade 
+  
+  def enter(self):
+    if not self.cleared:
+      super().enter()
+      self.cleared = True
+    else:
+      # TODO Dialogue stating you have been here already
+      pass # TODO Delete
+    self.exit(pyip.inputMenu(['north', 'east', 'south', 'west'], '')) # TODO Add Dialogue for exiting
 
 class Shop(Room):
   def __init__(self, north, east, south, west, enemy, item_a, item_b, item_c):
@@ -294,36 +418,47 @@ class Shop(Room):
     self.item_a = item_a
     self.item_b = item_b
     self.item_c = item_c
+  
+  # TODO Add Shop Function
+  
+  def enter(self):
+    if not self.cleared:
+      super().enter()
+    else:
+      # TODO Dialogue stating you have been here already and shop is empty
+      pass # TODO Delete
+    self.exit(pyip.inputMenu(['north', 'east', 'south', 'west'], '')) # TODO Add Dialogue for exiting
+
+# Create Rest Room
 
 # Moves
 
 # Guess a number to dinish Boss Super attack move?
 
+def generate_level_one(floor_level):
+  # Create all rooms
+  r_1_0 = Treasure(floor_level)
+  r_1_1 = Battle(floor_level)
+  r_1_2 = Battle(floor_level)
+  r_1_3 = Treasure(floor_level)
+  r_1_4 = Battle(floor_level)
+  r_1_5 = Battle(floor_level)
+  r_1_6 = Battle(floor_level)
+  r_1_7 = Treasure(floor_level)
+  r_1_8 = Battle(floor_level)
+  r_1_9 = Treasure(floor_level)
+  r_1_10 = Battle(floor_level)
+  r_1_11 = Battle(floor_level)
+  r_1_12 = Battle(floor_level)
+  r_1_13 = Battle(floor_level)
+  r_1_14 = Battle(floor_level) # Boss Room
+  r_1_15 = Shop(floor_level)
+  r_1_16 = Treasure(floor_level)
+  r_1_17 = Battle(floor_level)
 
-
-def main():
-  return 
-
-def generate_level_one():
-  r_1_1 = Battle()
-  r_1_2 = Battle()
-  r_1_3 = Treasure()
-  r_1_4 = Battle()
-  r_1_5 = Battle()
-  r_1_6 = Battle()
-  r_1_7 = Treasure()
-  r_1_8 = Battle()
-  r_1_9 = Treasure()
-  r_1_10 = Battle()
-  r_1_11 = Battle()
-  r_1_12 = Battle()
-  r_1_13 = Battle()
-  r_1_14 = Battle() # Boss Room
-  r_1_15 = Shop()
-  r_1_16 = Treasure()
-  r_1_17 = Battle()
-
+  # Connect all rooms
               # north, east, south, west
+  r_1_0.connect(r_1_1, None, None, None)
   r_1_1.connect(r_1_2, r_1_10, None, None)
   r_1_2.connect(None, None, r_1_1, r_1_3)
   r_1_3.connect(None, r_1_2, r_1_4, None)
@@ -342,6 +477,24 @@ def generate_level_one():
   r_1_16.connect(None, None, None, r_1_11)
   r_1_17.connect(None, None, None, r_1_10)
 
+  return r_1_0
+
+def main():
+  # Generate field
+  base = generate_level_one()
+
+  # TODO Opening Words
+  pyip.inputStr(prompt='Press "Enter" to begin', blank=True) # TODO Start Words
+  player_name = pyip.inputStr(prompt='')
+
+  # TODO Opening Cutscene
+  
+  hero_class_dict = {'corporate': Corporate, 'punk': Punk, 'detective': Detective} # TODO Put elsewhere
+  hero_class = pyip.inputMenu(['Corporate', 'Punk', 'Detective'], prompt='')
+  hero = hero_class_dict[hero_class](player_name) # Create hero 
+  # TODO Give hero stats
+
+  base.exit('north')
 
 
-  return
+  return 
